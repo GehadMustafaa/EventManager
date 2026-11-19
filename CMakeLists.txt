@@ -48,9 +48,20 @@ if(SEM_BUILD_GUI)
       gui/MainWindow.cpp
       gui/MainWindow.h
       gui/EventDialog.cpp
-      gui/EventDialog.h)
+      gui/EventDialog.h
+      gui/AttendeeDialog.cpp
+      gui/AttendeeDialog.h
+      gui/Delegates.cpp
+      gui/Delegates.h
+      gui/FormField.h
+      gui/Theme.cpp
+      gui/Theme.h
+      gui/ThemeTokens.inc)
     target_include_directories(sem_gui PRIVATE gui)
     target_link_libraries(sem_gui PRIVATE sem_core Qt${QT_VERSION_MAJOR}::Widgets)
+    if(MSVC)
+      target_compile_options(sem_gui PRIVATE /utf-8)
+    endif()
   else()
     message(STATUS "Qt not found: sem_gui skipped")
   endif()

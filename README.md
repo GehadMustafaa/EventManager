@@ -52,6 +52,9 @@ Default data file: `data/events.db`.
 | `src/main.cpp` | Console entry point |
 | `gui/MainWindow.h/.cpp` | Main GUI window: events, attendees, booking, waiting list view, save/load |
 | `gui/EventDialog.h/.cpp` | New-event form |
+| `gui/AttendeeDialog.h/.cpp` | Register-attendee form |
+| `gui/Theme.h/.cpp`, `gui/ThemeTokens.inc` | Design tokens, palette, stylesheet (see `docs/DESIGN.md`) |
+| `gui/Delegates.h/.cpp`, `gui/FormField.h` | Row painting, form field widget |
 | `gui/main_gui.cpp` | GUI entry point |
 | `tests/` | Unit tests per component |
 | `bench/benchmark.cpp` | Empirical Big-O measurements |
