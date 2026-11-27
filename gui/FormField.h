@@ -16,6 +16,11 @@ public:
         caption->setProperty("role", "fieldLabel");
         caption->setBuddy(input);
 
+        hint_ = new QLabel;
+        hint_->setProperty("role", "caption");
+        hint_->setWordWrap(true);
+        hint_->hide();
+
         error_ = new QLabel;
         error_->setProperty("role", "error");
         error_->setWordWrap(true);
@@ -23,13 +28,20 @@ public:
 
         layout->addWidget(caption);
         layout->addWidget(input);
+        layout->addWidget(hint_);
         layout->addWidget(error_);
+    }
+
+    void setHint(const QString& message) {
+        hint_->setText(message);
+        hint_->setVisible(!message.isEmpty());
     }
 
     void setError(const QString& message) {
         error_->setText(message);
         error_->setVisible(!message.isEmpty());
         input_->setProperty("invalid", !message.isEmpty());
+        input_->setAccessibleDescription(message);
         Theme::repolish(input_);
     }
 
@@ -37,5 +49,6 @@ public:
 
 private:
     QWidget* input_;
+    QLabel* hint_;
     QLabel* error_;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <iterator>
 #include <stdexcept>
 #include <utility>
 
@@ -15,6 +16,36 @@ class Queue {
     std::size_t size_ = 0;
 
 public:
+    class ConstIterator {
+        const Node* cur_;
+
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const T*;
+        using reference = const T&;
+
+        explicit ConstIterator(const Node* cur) : cur_(cur) {}
+
+        reference operator*() const { return cur_->value; }
+        pointer operator->() const { return &cur_->value; }
+
+        ConstIterator& operator++() {
+            cur_ = cur_->next;
+            return *this;
+        }
+
+        ConstIterator operator++(int) {
+            ConstIterator tmp = *this;
+            cur_ = cur_->next;
+            return tmp;
+        }
+
+        bool operator==(const ConstIterator& other) const { return cur_ == other.cur_; }
+        bool operator!=(const ConstIterator& other) const { return cur_ != other.cur_; }
+    };
+
     Queue() = default;
     Queue(const Queue&) = delete;
     Queue& operator=(const Queue&) = delete;
@@ -94,8 +125,11 @@ public:
         size_ = 0;
     }
 
+    ConstIterator begin() const { return ConstIterator(head_); }
+    ConstIterator end() const { return ConstIterator(nullptr); }
+
     template <typename F>
     void forEach(F fn) const {
-        for (Node* cur = head_; cur; cur = cur->next) fn(cur->value);
+        for (const T& v : *this) fn(v);
     }
 };

@@ -14,13 +14,16 @@ public:
         std::optional<int> promotedAttendeeId;
     };
 
-    Event(int id, std::string name, std::string date, std::string venue, int capacity);
+    Event(int id, std::string name, std::string date, std::string venue, int capacity,
+          std::string description = {}, std::string time = "09:00 AM");
 
     int id() const { return id_; }
     const std::string& name() const { return name_; }
     const std::string& date() const { return date_; }
+    const std::string& time() const { return time_; }
     const std::string& venue() const { return venue_; }
     int capacity() const { return capacity_; }
+    const std::string& description() const { return description_; }
 
     int seatsAvailable() const;
     std::size_t confirmedCount() const { return confirmed_.size(); }
@@ -31,6 +34,8 @@ public:
 
     BookResult book(int attendeeId);
     CancelResult cancel(int attendeeId);
+    std::vector<int> updateDetails(std::string name, std::string date, std::string venue, int capacity,
+                                   std::string description = {}, std::string time = "09:00 AM");
 
     std::vector<int> confirmedIds() const;
     std::vector<int> waitlistIds() const;
@@ -42,8 +47,11 @@ private:
     int id_;
     std::string name_;
     std::string date_;
+    std::string time_;
     std::string venue_;
     int capacity_;
+    std::string description_;
     HashTable<int, bool> confirmed_;
     Queue<int> waitlist_;
+    HashTable<int, bool> waitlistSet_;
 };

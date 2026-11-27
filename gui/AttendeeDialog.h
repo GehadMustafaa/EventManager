@@ -5,9 +5,13 @@
 class FormField;
 class QLineEdit;
 
+class QLabel;
+class QPushButton;
+
 class AttendeeDialog : public QDialog {
 public:
     explicit AttendeeDialog(QWidget* parent = nullptr);
+    AttendeeDialog(const QString& name, const QString& email, QWidget* parent = nullptr);
 
     QString name() const;
     QString email() const;
@@ -22,4 +26,7 @@ private:
     QLineEdit* email_;
     FormField* nameField_;
     FormField* emailField_;
+    QLabel* titleLabel_;
+    QLabel* leadLabel_;
+    QPushButton* submitButton_;
 };

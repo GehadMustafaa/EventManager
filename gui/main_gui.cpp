@@ -14,7 +14,9 @@ int main(int argc, char* argv[]) {
     const Theme::Mode mode = saved == "dark"    ? Theme::Mode::Dark
                              : saved == "light" ? Theme::Mode::Light
                                                 : Theme::systemMode();
-    Theme::apply(app, mode);
+    const bool savedHc = QSettings().contains("highContrast") ? QSettings().value("highContrast").toBool()
+                                                              : Theme::systemHighContrast();
+    Theme::apply(app, mode, savedHc ? Theme::Contrast::High : Theme::Contrast::Standard);
 
     QString dataPath = argc > 1 ? QString::fromLocal8Bit(argv[1])
                                 : QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/events.db";

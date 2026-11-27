@@ -16,16 +16,18 @@ bool hasInvalidChars(const QString& value) {
 AttendeeDialog::AttendeeDialog(QWidget* parent) : QDialog(parent), name_(new QLineEdit), email_(new QLineEdit) {
     setWindowTitle("Register Attendee");
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
-    setFixedWidth(440);
+    setFixedWidth(460);
 
     name_->setPlaceholderText("Ada Lovelace");
     email_->setPlaceholderText("ada@example.com");
 
     auto* title = new QLabel("Register Attendee");
     title->setFont(Theme::titleFont(20));
+    titleLabel_ = title;
     auto* lead = new QLabel("Attendees are identified by email, so each one can be registered once.");
     lead->setProperty("role", "muted");
     lead->setWordWrap(true);
+    leadLabel_ = lead;
 
     nameField_ = new FormField("Name", name_);
     emailField_ = new FormField("Email", email_);
@@ -36,18 +38,22 @@ AttendeeDialog::AttendeeDialog(QWidget* parent) : QDialog(parent), name_(new QLi
     submit->setProperty("variant", "primary");
     submit->setFocusPolicy(Qt::TabFocus);
     submit->setDefault(true);
+    submitButton_ = submit;
     auto* buttons = new QHBoxLayout;
     buttons->setSpacing(Theme::space2);
     buttons->addStretch();
     buttons->addWidget(cancel);
     buttons->addWidget(submit);
 
+    auto* headerGroup = new QVBoxLayout;
+    headerGroup->setSpacing(Theme::space1);
+    headerGroup->addWidget(title);
+    headerGroup->addWidget(lead);
+
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(Theme::space6, Theme::space6, Theme::space6, Theme::space6);
     layout->setSpacing(Theme::space4);
-    layout->addWidget(title);
-    layout->addWidget(lead);
-    layout->addSpacing(Theme::space1);
+    layout->addLayout(headerGroup);
     layout->addWidget(nameField_);
     layout->addWidget(emailField_);
     layout->addSpacing(Theme::space2);
@@ -57,6 +63,16 @@ AttendeeDialog::AttendeeDialog(QWidget* parent) : QDialog(parent), name_(new QLi
     connect(submit, &QPushButton::clicked, this, [this] { if (validate()) accept(); });
     connect(name_, &QLineEdit::textChanged, this, [this] { if (nameField_->hasError()) nameField_->setError(QString()); });
     connect(email_, &QLineEdit::textChanged, this, [this] { if (emailField_->hasError()) emailField_->setError(QString()); });
+}
+
+AttendeeDialog::AttendeeDialog(const QString& name, const QString& email, QWidget* parent)
+    : AttendeeDialog(parent) {
+    setWindowTitle("Edit Attendee");
+    titleLabel_->setText("Edit Attendee");
+    leadLabel_->setText("Update the attendee's name or email address.");
+    submitButton_->setText("Save Changes");
+    name_->setText(name);
+    email_->setText(email);
 }
 
 bool AttendeeDialog::validate() {

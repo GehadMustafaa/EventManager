@@ -9,7 +9,13 @@ enum {
     Booked,                   // int, Kind::Seats only
     Capacity,                 // int, Kind::Seats only
     Email,                    // QString, person rows
-    Position                  // int, waitlist rows (1-based), 0 = none
+    Position,                 // int, waitlist rows (1-based), 0 = none
+    SortValue,                // qint64, optional numeric sort key
+    Monospace,                // bool, render cell with Theme::monoFont
+    BadgeText,                // QString, status pill (Confirmed / Waitlist #N)
+    BadgeKind,                // QString, "success" | "warning" | "neutral"
+    ShowCancelAction,         // bool, render hover Cancel chip on person/booking row
+    ElideMode                 // int (Qt::TextElideMode), defaults to Qt::ElideRight
 };
 enum Kind { Plain = 0, Seats = 1 };
 }  // namespace ItemRole
@@ -32,10 +38,11 @@ public:
     QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
-// List rows for people: optional waitlist position, name, then email in secondary tone.
+// List rows for people or bookings: optional waitlist position, name, secondary email/meta, badge, and hover Cancel chip.
 class PersonDelegate : public HoverDelegate {
 public:
     using HoverDelegate::HoverDelegate;
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    static QRect cancelRect(const QRect& rowRect);
 };
