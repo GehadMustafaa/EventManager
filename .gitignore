@@ -1,12 +1,37 @@
 # ==========================================
 # Qt Creator & CMake Build Directories
 # ==========================================
+.qtcreator/
 build/
 build-*/
+cmake-build-*/
+out/
 CMakeLists.txt.user
 *.user
 *.user.*
 *.autosave
+CMakeUserPresets.json
+
+# CMake / CTest output inside source tree
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+
+# clangd / language server caches
+.cache/
+.qtc_clangd/
+
+# ==========================================
+# Qt Generated Sources
+# ==========================================
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+*_autogen/
 
 # ==========================================
 # C++ Executables, Libraries & Objects
@@ -21,9 +46,12 @@ CMakeLists.txt.user
 *.dylib
 *.a
 *.lib
+*.pdb
+*.ilk
+*.exp
 
 # ==========================================
-# Visual Studio Files (To prevent accidental commits)
+# Visual Studio Files
 # ==========================================
 *.sln
 *.slnx
@@ -43,3 +71,32 @@ x86/
 .idea/
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ==========================================
+# App Data, Backups & Local Artifacts
+# ==========================================
+*.db
+*.bak
+app-package/
+screenshots/
+
+# ==========================================
+# Python Helper Scripts
+# ==========================================
+__pycache__/
+*.pyc
+
+# ==========================================
+# Temp, Logs & Sync Leftovers
+# ==========================================
+*.tmp
+*.log
+*~
+*.swp
+~$*
+
+# ==========================================
+# Local Tooling
+# ==========================================
+.agents/
