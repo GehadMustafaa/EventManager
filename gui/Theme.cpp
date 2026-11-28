@@ -48,10 +48,10 @@ void build(const char *const *n, const char *const *a, const char *const *s,
   set("border-subtle", highContrast ? n[6] : n[5]); // panel outline
   set("border", highContrast ? n[7] : n[6]);        // component border
   set("border-strong", n[7]);
-  set("control", control);   // input outline, >= 3:1 on panel
-  set("text-off", textOff);  // legible disabled foreground
-  set("text-2", n[10]);      // secondary text in all modes
-  set("text", n[11]);        // primary text
+  set("control", control);  // input outline, >= 3:1 on panel
+  set("text-off", textOff); // legible disabled foreground
+  set("text-2", n[10]);     // secondary text in all modes
+  set("text", n[11]);       // primary text
   set("on-solid", onSolid);
 
   set("accent-bg", a[2]);
@@ -163,11 +163,17 @@ QPushButton[variant="icon"]:disabled { background: transparent; color: @{text-of
 QPushButton[variant="nav"] { background: transparent; border: 1px solid transparent; border-radius: 6px;
                              padding: 4px 10px; min-height: 24px; text-align: left; font-weight: 400; color: @{text-2}; }
 QPushButton[variant="nav"]:hover { background: @{fill}; color: @{text}; }
+QPushButton[variant="nav"]:pressed { background: @{fill-active}; color: @{text}; }
 QPushButton[variant="nav"][active="true"] { background: @{fill-active}; color: @{text}; font-weight: 600; }
 QPushButton[variant="nav"][kbdFocus="true"] { border: 2px solid @{accent}; padding: 3px 9px; }
 QPushButton[variant="nav"] QLabel[role="navText"] { color: @{text-2}; font-weight: 400; }
-QPushButton[variant="nav"]:hover QLabel[role="navText"] { color: @{text}; }
+QPushButton[variant="nav"]:hover QLabel[role="navText"], QPushButton[variant="nav"]:pressed QLabel[role="navText"] { color: @{text}; }
 QPushButton[variant="nav"][active="true"] QLabel[role="navText"] { color: @{text}; font-weight: 600; }
+QPushButton[variant="nav"] QLabel[toggleChip="true"] { background: @{panel}; color: @{text-2}; border: 1px solid @{border};
+                                                      border-radius: 6px; padding: 1px 9px; min-height: 20px; font-size: 11px; font-weight: 600; }
+QPushButton[variant="nav"] QLabel[toggleChip="true"][chip="subtle"] { background: @{fill-active}; color: @{text}; border: 1px solid @{border}; }
+QPushButton[variant="nav"]:hover QLabel[toggleChip="true"] { background: @{fill-hover}; color: @{text}; border: 1px solid @{border-strong}; }
+QPushButton[variant="nav"]:pressed QLabel[toggleChip="true"] { background: @{fill-active}; color: @{text}; border: 1px solid @{text-2}; }
 QPushButton[variant="segment"] { background: transparent; border: 2px solid transparent; border-radius: 4px;
                                  padding: 3px 7px; min-height: 18px; font-size: 12px; font-weight: 400; color: @{text-2}; }
 QPushButton[variant="segment"]:hover { color: @{text}; }
@@ -199,13 +205,14 @@ QSpinBox::up-button, QSpinBox::down-button { width: 16px; border: none; backgrou
 QComboBox QAbstractItemView { background: @{panel}; color: @{text}; border: 1px solid @{border-subtle}; border-radius: 6px; padding: 4px;
                             selection-background-color: @{accent-bg}; selection-color: @{text}; outline: 0; }
 
-QTableView, QListView { background: transparent; border: none; }
+QTableView, QListView, QScrollArea, QStackedWidget { background: transparent; border: none; }
+QScrollArea > QWidget, QScrollArea > QWidget > QWidget, QWidget#qt_scrollarea_viewport { background: transparent; }
 QTableWidget, QListWidget { background: transparent; border: 1px solid transparent; border-radius: 6px; gridline-color: transparent; outline: 0; }
 QTableWidget[kbdFocus="true"], QListWidget[kbdFocus="true"] { border: 2px solid @{accent}; }
 QTableWidget::item, QListWidget::item { border: none; }
 QHeaderView { background: transparent; }
 QHeaderView::section { background: transparent; color: @{text-2}; border: none; border-bottom: 1px solid @{border-subtle};
-                       padding: 6px 12px; font-size: 12px; font-weight: 600; }
+                       padding: 6px @{cell-pad}; font-size: 12px; font-weight: 600; }
 QTableCornerButton::section { background: transparent; border: none; }
 
 QScrollBar:vertical { background: transparent; width: 10px; margin: 0; }
@@ -397,12 +404,13 @@ public:
                    sz, sz);
     }
     if (element == SE_HeaderLabel) {
+      int rightPad = Theme::cellPadding;
       if (const auto *hdr =
               qstyleoption_cast<const QStyleOptionHeader *>(opt)) {
         if (hdr->sortIndicator != QStyleOptionHeader::None)
-          return QProxyStyle::subElementRect(element, opt, w)
-              .adjusted(0, 0, -16, 0);
+          rightPad += 16;
       }
+      return opt->rect.adjusted(Theme::cellPadding, 0, -rightPad, 0);
     }
     return QProxyStyle::subElementRect(element, opt, w);
   }
@@ -412,6 +420,8 @@ private:
 };
 
 QString expand(QString qss) {
+  qss.replace(QStringLiteral("@{cell-pad}"),
+              QString::number(Theme::cellPadding) + QStringLiteral("px"));
   for (auto it = g_colors.constBegin(); it != g_colors.constEnd(); ++it)
     qss.replace(QStringLiteral("@{") + it.key() + QLatin1Char('}'),
                 it.value().name());
@@ -458,7 +468,8 @@ void apply(QApplication &app, Mode m, bool hc) {
   if (m == Mode::Dark) {
     if (hc)
       build(kDarkHcNeutral, kDarkHcAccent, kDarkHcSuccess, kDarkHcWarning,
-            kDarkHcDanger, kDarkHcControl, kDarkHcTextOff, kOnSolid, true, true);
+            kDarkHcDanger, kDarkHcControl, kDarkHcTextOff, kOnSolid, true,
+            true);
     else
       build(kDarkNeutral, kDarkAccent, kDarkSuccess, kDarkWarning, kDarkDanger,
             kDarkControl, kDarkTextOff, kOnSolid, true, false);

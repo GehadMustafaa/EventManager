@@ -62,7 +62,7 @@ QString toQ(const std::string &s) { return QString::fromStdString(s); }
 
 QString formatDisplayDate(const std::string &isoDate) {
   const QDate d = QDate::fromString(toQ(isoDate), QStringLiteral("yyyy-MM-dd"));
-  return d.isValid() ? QLocale().toString(d, QLocale::ShortFormat)
+  return d.isValid() ? QLocale().toString(d, QStringLiteral("ddd d MMM yyyy"))
                      : toQ(isoDate);
 }
 
@@ -110,6 +110,8 @@ QTableWidget *makeTable(const QStringList &headers) {
   table->horizontalHeader()->setSectionsClickable(true);
   table->horizontalHeader()->setSortIndicatorShown(true);
   table->horizontalHeader()->setStretchLastSection(false);
+  table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft |
+                                                 Qt::AlignVCenter);
   table->horizontalHeader()->setMinimumSectionSize(56);
   table->setSortingEnabled(true);
   return table;
@@ -864,7 +866,7 @@ QWidget *MainWindow::buildSidebarRail() {
                        bool checkable = false) -> QPushButton * {
     auto *btn = new QPushButton;
     btn->setProperty("variant", "nav");
-    btn->setMinimumHeight(32);
+    btn->setMinimumHeight(checkable ? 34 : 32);
     btn->setFocusPolicy(Qt::TabFocus);
     btn->setAccessibleName(label);
     if (checkable)
@@ -876,6 +878,10 @@ QWidget *MainWindow::buildSidebarRail() {
     row->addWidget(textLabel, 1, Qt::AlignVCenter);
     auto *badge = new QLabel("0");
     badge->setProperty("chip", "neutral");
+    if (checkable) {
+      badge->setProperty("toggleChip", true);
+      badge->setMinimumHeight(24);
+    }
     badge->setFont(Theme::monoFont(11));
     badge->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     row->addWidget(badge, 0, Qt::AlignVCenter);
@@ -1086,6 +1092,10 @@ QWidget *MainWindow::buildEventsView() {
   eventsTable_->setColumnWidth(EventCol::Waitlist, 66);
   eventsTable_->setColumnWidth(EventCol::Id, 56);
   setHeaderAlignment(eventsTable_, EventCol::Name, Qt::AlignLeft);
+  setHeaderAlignment(eventsTable_, EventCol::Date, Qt::AlignLeft);
+  setHeaderAlignment(eventsTable_, EventCol::Time, Qt::AlignLeft);
+  setHeaderAlignment(eventsTable_, EventCol::Venue, Qt::AlignLeft);
+  setHeaderAlignment(eventsTable_, EventCol::Booked, Qt::AlignLeft);
   setHeaderAlignment(eventsTable_, EventCol::Waitlist, Qt::AlignRight);
   setHeaderAlignment(eventsTable_, EventCol::Id, Qt::AlignRight);
   trackHover(eventsTable_, new TableDelegate(eventsTable_));
@@ -1173,6 +1183,7 @@ QWidget *MainWindow::buildAttendeesView() {
   attendeesTable_->setColumnWidth(AttendeeCol::Bookings, 118);
   attendeesTable_->setColumnWidth(AttendeeCol::Id, 56);
   setHeaderAlignment(attendeesTable_, AttendeeCol::Name, Qt::AlignLeft);
+  setHeaderAlignment(attendeesTable_, AttendeeCol::Email, Qt::AlignLeft);
   setHeaderAlignment(attendeesTable_, AttendeeCol::Bookings, Qt::AlignRight);
   setHeaderAlignment(attendeesTable_, AttendeeCol::Id, Qt::AlignRight);
   trackHover(attendeesTable_, new TableDelegate(attendeesTable_));
@@ -1228,7 +1239,7 @@ QWidget *MainWindow::buildEventInspector() {
   eventTitle_ = new QLabel;
   eventTitle_->setFont(Theme::titleFont(20));
   eventTitle_->setWordWrap(true);
-  editEventBtn_ = makeButton("Edit", "ghost");
+  editEventBtn_ = makeButton("Edit");
   editEventBtn_->setAccessibleName("Edit Event");
   editEventBtn_->setToolTip("Edit Event (Ctrl+E)");
   deleteEventBtn_ = makeButton("Delete Event", "danger");
@@ -1382,6 +1393,9 @@ QWidget *MainWindow::buildEventInspector() {
   auto *detailScroll = new QScrollArea;
   detailScroll->setFocusPolicy(Qt::NoFocus);
   detailScroll->viewport()->setFocusPolicy(Qt::NoFocus);
+  detailScroll->setAutoFillBackground(false);
+  detailScroll->viewport()->setAutoFillBackground(false);
+  detail->setAutoFillBackground(false);
   detailScroll->setWidgetResizable(true);
   detailScroll->setFrameShape(QFrame::NoFrame);
   detailScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -1409,7 +1423,7 @@ QWidget *MainWindow::buildAttendeeInspector() {
   attendeeTitle_ = new QLabel;
   attendeeTitle_->setFont(Theme::titleFont(20));
   attendeeTitle_->setWordWrap(true);
-  editAttendeeBtn_ = makeButton("Edit", "ghost");
+  editAttendeeBtn_ = makeButton("Edit");
   editAttendeeBtn_->setAccessibleName("Edit Attendee");
   editAttendeeBtn_->setToolTip("Edit Attendee (Ctrl+Shift+E)");
   deleteAttendeeBtn_ = makeButton("Delete Attendee", "danger");
@@ -1523,6 +1537,9 @@ QWidget *MainWindow::buildAttendeeInspector() {
   auto *detailScroll = new QScrollArea;
   detailScroll->setFocusPolicy(Qt::NoFocus);
   detailScroll->viewport()->setFocusPolicy(Qt::NoFocus);
+  detailScroll->setAutoFillBackground(false);
+  detailScroll->viewport()->setAutoFillBackground(false);
+  detail->setAutoFillBackground(false);
   detailScroll->setWidgetResizable(true);
   detailScroll->setFrameShape(QFrame::NoFrame);
   detailScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

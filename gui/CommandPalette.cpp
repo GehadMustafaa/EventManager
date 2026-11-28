@@ -58,7 +58,7 @@ public:
             painter->setBrush(Theme::color("fill"));
             painter->drawRoundedRect(pillRect, 4, 4);
             painter->setFont(kbdFont);
-            painter->setPen(enabled ? Theme::color("text-2") : Theme::color("text-off"));
+            painter->setPen(Theme::color("text-2"));
             painter->drawText(pillRect, Qt::AlignCenter, shortcut);
             rightEdge = pillRect.left() - Theme::space3;
         }
@@ -78,7 +78,7 @@ public:
             painter->setBrush(Theme::color("fill"));
             painter->drawRoundedRect(tagRect, 4, 4);
             painter->setFont(tagFont);
-            painter->setPen(Theme::color("text-off"));
+            painter->setPen(Theme::color("text-2"));
             painter->drawText(tagRect, Qt::AlignCenter, tag);
             rightEdge = tagRect.left() - Theme::space2;
         }
@@ -94,14 +94,14 @@ public:
         if (!category.isEmpty()) {
             const QString catLabel = category + QStringLiteral("  ·  ");
             const int catW = fm.horizontalAdvance(catLabel);
-            painter->setPen(enabled ? Theme::color("text-2") : Theme::color("text-off"));
+            painter->setPen(Theme::color("text-2"));
             painter->drawText(QRect(x, area.top(), catW, area.height()), int(Qt::AlignVCenter) | int(Qt::AlignLeft), catLabel);
             x += catW;
         }
 
         const int avail = qMax(40, rightEdge - x);
         const QString titleText = alias.isEmpty() ? title : QString("%1  (%2)").arg(title, alias);
-        painter->setPen(enabled ? Theme::color("text") : Theme::color("text-off"));
+        painter->setPen(enabled ? Theme::color("text") : Theme::color("text-2"));
         painter->drawText(QRect(x, area.top(), avail, area.height()), int(Qt::AlignVCenter) | int(Qt::AlignLeft),
                           fm.elidedText(titleText, Qt::ElideRight, avail));
         painter->restore();
